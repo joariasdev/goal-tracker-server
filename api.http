@@ -1,0 +1,9 @@
+POST http://localhost:3000/goals
+Content-Type: application/json
+ 
+{
+    "title": "Move out on my own"
+}
+
+########
+
