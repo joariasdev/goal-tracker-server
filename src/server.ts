@@ -3,10 +3,13 @@ import express, { Request, Response } from 'express';
 import db from './config/db';
 import CreateGoalRequestBody from './models/CreateGoalRequestBody';
 import Goal from './models/Goal';
+import cors from 'cors';
 
 const app = express();
 
 app.disable('x-powered-by');
+
+app.use(cors());
 
 app.use(express.json());
 
