@@ -15,11 +15,13 @@
   "packageManager": "pnpm@10.19.0",
   "dependencies": {
     "dotenv": "^17.2.3",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^24.10.1",
+    "@types/pg": "^8.15.6",
     "eslint": "^9.39.1",
     "nodemon": "^3.1.11",
     "prettier": "^3.7.3",
