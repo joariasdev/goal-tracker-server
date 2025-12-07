@@ -1,8 +1,7 @@
 import config from './config/config';
 import express, { Request, Response } from 'express';
 import db from './config/db';
-import CreateGoalRequestBody from './models/CreateGoalRequestBody';
-import Goal from './models/Goal';
+import type { Goal, GoalView } from './models/Goal';
 import cors from 'cors';
 
 const app = express();
@@ -19,14 +18,14 @@ app.get('/', (req, res) => {
 
 app.post(
   '/goals',
-  async (req: Request<any, any, CreateGoalRequestBody>, res: Response) => {
-    const { title } = req.body;
+  async (req: Request<any, any, GoalView>, res: Response) => {
+    const { title }: GoalView = req.body;
 
     const result = await db.query<Goal>(
       'INSERT INTO goals (title) VALUES($1) RETURNING *',
       [title],
     );
-    res.status(201).send(result.rows);
+    res.status(201).send(result.rows[0]);
   },
 );
 

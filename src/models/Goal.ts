@@ -1,4 +1,7 @@
-export default interface Goal {
-  id: number;
+export interface GoalView {
   title: string;
+}
+
+export interface Goal extends GoalView {
+  id: number;
 }
