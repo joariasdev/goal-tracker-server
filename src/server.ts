@@ -16,18 +16,20 @@ app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
 
-app.post(
-  '/goals',
-  async (req: Request<any, any, GoalView>, res: Response) => {
-    const { title }: GoalView = req.body;
+app.get('/goals', async (req: Request, res: Response) => {
+  const result = await db.query<Goal>('SELECT * FROM goals');
+  res.status(200).send(result.rows);
+});
 
-    const result = await db.query<Goal>(
-      'INSERT INTO goals (title) VALUES($1) RETURNING *',
-      [title],
-    );
-    res.status(201).send(result.rows[0]);
-  },
-);
+app.post('/goals', async (req: Request<any, any, GoalView>, res: Response) => {
+  const { title }: GoalView = req.body;
+
+  const result = await db.query<Goal>(
+    'INSERT INTO goals (title) VALUES($1) RETURNING *',
+    [title],
+  );
+  res.status(201).send(result.rows[0]);
+});
 
 app.listen(config.port, () =>
   console.log(`Server is running on port: ${config.port}`),
