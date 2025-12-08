@@ -21,6 +21,14 @@ app.get('/goals', async (req: Request, res: Response) => {
   res.status(200).send(result.rows);
 });
 
+app.get('/goals/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await db.query<Goal>('SELECT * FROM goals WHERE id = $1', [
+    id,
+  ]);
+  res.status(200).send(result.rows);
+});
+
 app.post('/goals', async (req: Request<any, any, GoalView>, res: Response) => {
   const { title }: GoalView = req.body;
 

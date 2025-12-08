@@ -7,3 +7,10 @@ Content-Type: application/json
 
 ########
 
+GET http://localhost:3000/goals
+
+########
+
+GET http://localhost:3000/goals/
+
+########
