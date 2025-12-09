@@ -26,7 +26,7 @@ app.get('/goals/:id', async (req: Request, res: Response) => {
   const result = await db.query<Goal>('SELECT * FROM goals WHERE id = $1', [
     id,
   ]);
-  res.status(200).send(result.rows);
+  res.status(200).send(result.rows[0]);
 });
 
 app.post('/goals', async (req: Request<any, any, GoalView>, res: Response) => {
@@ -37,6 +37,14 @@ app.post('/goals', async (req: Request<any, any, GoalView>, res: Response) => {
     [title],
   );
   res.status(201).send(result.rows[0]);
+});
+
+app.delete('/goals/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await db.query<Goal>('DELETE FROM goals WHERE id = $1 RETURNING *', [
+    id,
+  ]);
+  res.status(200).send(result.rows[0]);
 });
 
 app.listen(config.port, () =>
