@@ -15,6 +15,15 @@ GET http://localhost:3000/goals/4
 
 ########
 
+PUT http://localhost:3000/goals/20
+Content-Type: application/json
+ 
+{
+    "title": "Make a song"
+}
+
+########
+
 DELETE  http://localhost:3000/goals/5
 
 ########
