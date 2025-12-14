@@ -1,63 +1,19 @@
 import config from './config/config';
-import express, { Request, Response } from 'express';
-import db from './config/db';
-import type { Goal, GoalView } from './models/Goal';
+import express from 'express';
 import cors from 'cors';
+import apiRouter from './routes/apiRouter';
+import logger from 'morgan';
 
 const app = express();
 
 app.disable('x-powered-by');
 
+app.use(logger('dev'));
 app.use(cors());
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
-
-app.get('/goals', async (req: Request, res: Response) => {
-  const result = await db.query<Goal>('SELECT * FROM goals');
-  res.status(200).send(result.rows);
-});
-
-app.get('/goals/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await db.query<Goal>('SELECT * FROM goals WHERE id = $1', [
-    id,
-  ]);
-  res.status(200).send(result.rows[0]);
-});
-
-app.post('/goals', async (req: Request<any, any, GoalView>, res: Response) => {
-  const { title }: GoalView = req.body;
-
-  const result = await db.query<Goal>(
-    'INSERT INTO goals (title) VALUES($1) RETURNING *',
-    [title],
-  );
-  res.status(201).send(result.rows[0]);
-});
-
-app.put('/goals/:id', async (req: Request<any, any, GoalView>, res: Response) => {
-  const { id } = req.params;
-  const { title }: GoalView = req.body;
-
-  const result = await db.query<Goal>(
-    'UPDATE goals SET title = $2 WHERE id = $1 RETURNING *',
-    [id, title],
-  );
-  res.status(200).send(result.rows[0]);
-});
-
-app.delete('/goals/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await db.query<Goal>(
-    'DELETE FROM goals WHERE id = $1 RETURNING *',
-    [id],
-  );
-  res.status(200).send(result.rows[0]);
-});
+app.use('/api', apiRouter);
 
 app.listen(config.port, () =>
   console.log(`Server is running on port: ${config.port}`),

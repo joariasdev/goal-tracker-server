@@ -1,4 +1,4 @@
-POST http://localhost:3000/goals
+POST http://localhost:3000/api/goals
 Content-Type: application/json
  
 {
@@ -7,15 +7,15 @@ Content-Type: application/json
 
 ########
 
-GET http://localhost:3000/goals
+GET http://localhost:3000/api/goals
 
 ########
 
-GET http://localhost:3000/goals/4
+GET http://localhost:3000/api/goals/22
 
 ########
 
-PUT http://localhost:3000/goals/20
+PUT http://localhost:3000/api/goals/22
 Content-Type: application/json
  
 {
@@ -24,6 +24,6 @@ Content-Type: application/json
 
 ########
 
-DELETE  http://localhost:3000/goals/5
+DELETE  http://localhost:3000/api/goals/22
 
 ########
