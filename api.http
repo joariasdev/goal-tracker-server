@@ -2,7 +2,7 @@ POST http://localhost:3000/api/goals
 Content-Type: application/json
  
 {
-    "title": "Move out on my own"
+    "title": "Become a software developer"
 }
 
 ########
@@ -11,19 +11,19 @@ GET http://localhost:3000/api/goals
 
 ########
 
-GET http://localhost:3000/api/goals/22
+GET http://localhost:3000/api/goals/5
 
 ########
 
-PUT http://localhost:3000/api/goals/22
+PUT http://localhost:3000/api/goals/16
 Content-Type: application/json
  
 {
-    "title": "Make a song"
+    "title": "Move out"
 }
 
 ########
 
-DELETE  http://localhost:3000/api/goals/22
+DELETE  http://localhost:3000/api/goals/1
 
 ########
