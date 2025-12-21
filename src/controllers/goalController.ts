@@ -2,6 +2,7 @@ import db from '../config/db';
 import HttpError from '../errors/HttpError';
 import { Goal, GoalView } from '../models/Goal';
 import { NextFunction, Request, Response } from 'express';
+import { body, validationResult } from 'express-validator';
 
 class goalController {
   static getAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -30,62 +31,78 @@ class goalController {
     }
   };
 
-  static create = async (
-    req: Request<any, any, GoalView>,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      const { title }: GoalView = req.body;
+  static create = [
+    body('title')
+      .trim()
+      .notEmpty()
+      .withMessage('Title is required and must be a non-empty string.')
+      .escape(),
 
-      if (!title || typeof title !== 'string' || title.trim().length === 0) {
-        throw new HttpError(
-          'Title is required and must be a non-empty string.',
-          400,
+    async (
+      req: Request<any, any, GoalView>,
+      res: Response,
+      next: NextFunction,
+    ) => {
+      try {
+        const validationErrors = validationResult(req);
+
+        if (!validationErrors.isEmpty()) {
+          res.status(400).send({ errors: validationErrors.array() });
+          return;
+        }
+
+        const { title }: GoalView = req.body;
+
+        const result = await db.query<Goal>(
+          'INSERT INTO goals (title) VALUES($1) RETURNING *',
+          [title],
         );
+
+        res.status(201).send(result.rows[0]);
+      } catch (err) {
+        next(err);
       }
+    },
+  ];
 
-      const result = await db.query<Goal>(
-        'INSERT INTO goals (title) VALUES($1) RETURNING *',
-        [title],
-      );
+  static update = [
+    body('title')
+      .trim()
+      .notEmpty()
+      .withMessage('Title is required and must be a non-empty string.')
+      .escape(),
 
-      res.status(201).send(result.rows[0]);
-    } catch (err) {
-      next(err);
-    }
-  };
+    async (
+      req: Request<any, any, GoalView>,
+      res: Response,
+      next: NextFunction,
+    ) => {
+      try {
+        const validationErrors = validationResult(req);
 
-  static update = async (
-    req: Request<any, any, GoalView>,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      const { id } = req.params;
-      const { title }: GoalView = req.body;
+        if (!validationErrors.isEmpty()) {
+          res.status(400).send({ errors: validationErrors.array() });
+          return;
+        }
 
-      if (!title || typeof title !== 'string' || title.trim().length === 0) {
-        throw new HttpError(
-          'Title is required and must be a non-empty string.',
-          400,
+        const { id } = req.params;
+        const { title }: GoalView = req.body;
+
+        const result = await db.query<Goal>(
+          'UPDATE goals SET title = $2 WHERE id = $1 RETURNING *',
+          [id, title],
         );
+
+        if (result.rowCount === 0) {
+          throw new HttpError(`Goal with ID ${id} not found.`, 404);
+        }
+
+        res.status(200).send(result.rows[0]);
+      } catch (err) {
+        next(err);
       }
-
-      const result = await db.query<Goal>(
-        'UPDATE goals SET title = $2 WHERE id = $1 RETURNING *',
-        [id, title],
-      );
-
-      if (result.rowCount === 0) {
-        throw new HttpError(`Goal with ID ${id} not found.`, 404);
-      }
-
-      res.status(200).send(result.rows[0]);
-    } catch (err) {
-      next(err);
-    }
-  };
+    },
+  ];
 
   static delete = async (req: Request, res: Response, next: NextFunction) => {
     try {

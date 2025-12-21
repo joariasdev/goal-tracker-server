@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import goalController from '../controllers/goalController';
 
+
 const router = Router();
 
 router.get('/', goalController.getAll);
