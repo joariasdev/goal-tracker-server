@@ -1,21 +1,19 @@
 import { Router } from 'express';
 import db from '../config/db';
-import { User } from '../models/User';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import HttpError from '../errors/HttpError';
 import { env } from '../config/env';
+import PostgreUserRepository from '../repositories/PostgreUserRepository';
 
 const router = Router();
+const userRepo = new PostgreUserRepository(db);
 
 router.post('/login', async (req, res, next) => {  
   try {
     const { email, password } = req.body;
-    const queryResult = await db.query<User>(
-      'SELECT * FROM users WHERE email = $1',
-      [email],
-    );
-    const user: User = queryResult.rows[0];
+
+    const user = await userRepo.findByEmail(email);
 
     if (!user) return res.status(404).json({ error: 'User not found' });
 
@@ -39,12 +37,7 @@ router.post('/register', async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, env.SALT_ROUNDS);
 
-    const queryResult = await db.query<User>(
-      'INSERT INTO users(email, password) VALUES($1, $2) RETURNING *',
-      [email, hashedPassword],
-    );
-
-    const user = queryResult.rows[0];
+    const user = userRepo.create(email, hashedPassword)
 
     if (!user) throw new HttpError('User creation failed.', 500);
 
