@@ -1,9 +1,12 @@
-import config from './config/config';
+import { env } from './config/env';
 import express from 'express';
 import cors from 'cors';
 import apiRouter from './routes/apiRouter';
 import logger from 'morgan';
-import errorHandler from './middleware/errorHandler'
+import errorHandler from './middleware/errorHandler';
+import authRouter from './routes/authRouter';
+import passport from 'passport';
+import configPassport from './config/passport';
 
 const app = express();
 
@@ -14,10 +17,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api', apiRouter);
+configPassport(passport);
+app.use(passport.initialize());
 
-app.use(errorHandler)
+app.use('/auth', authRouter);
+app.use('/api', passport.authenticate('jwt', { session: false }), apiRouter);
 
-app.listen(config.port, () =>
-  console.log(`Server is running on port: ${config.port}`),
+app.use(errorHandler);
+
+app.listen(env.PORT, () =>
+  console.log(`Server is running on port: ${env.PORT}`),
 );

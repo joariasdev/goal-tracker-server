@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 
 class goalController {
-  static getAll = async (req: Request, res: Response, next: NextFunction) => {
+  static getAll = async (_req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await db.query<Goal>('SELECT * FROM goals');
       res.status(200).send(result.rows);
@@ -39,7 +39,7 @@ class goalController {
       .escape(),
 
     async (
-      req: Request<any, any, GoalView>,
+      req: Request,
       res: Response,
       next: NextFunction,
     ) => {
@@ -73,7 +73,7 @@ class goalController {
       .escape(),
 
     async (
-      req: Request<any, any, GoalView>,
+      req: Request,
       res: Response,
       next: NextFunction,
     ) => {

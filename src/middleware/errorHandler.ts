@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
+import HttpError from '../errors/HttpError';
 
 const errorHandler = (
-  err: any,
+  err: HttpError,
   req: Request,
   res: Response,
   next: NextFunction,
@@ -9,7 +10,7 @@ const errorHandler = (
   if (res.headersSent) return next(err);
 
   const isProduction = process.env.NODE_ENV === 'production';
-  const statusCode = err.status || err.statusCode || 500;
+  const statusCode = err.status || 500;
 
   if (!isProduction) {
     console.error(`[DEV LOG - ${statusCode}] ${req.method} ${req.originalUrl}`);
@@ -19,7 +20,6 @@ const errorHandler = (
   }
 
   res.status(statusCode).json({
-    success: false,
     status: statusCode,
     message:
       statusCode >= 500 && isProduction
