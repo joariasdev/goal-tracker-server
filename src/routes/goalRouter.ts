@@ -1,6 +1,10 @@
+import db from '../config/db';
+import PostgreGoalRepository from '../repositories/PostgreGoalRepository';
+import GoalController from '../controllers/GoalController';
 import { Router } from 'express';
-import goalController from '../controllers/goalController';
 
+const goalRepo = new PostgreGoalRepository(db);
+const goalController = new GoalController(goalRepo);
 
 const router = Router();
 
