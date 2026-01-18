@@ -7,6 +7,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production']),
   PORT: z.string().transform(Number),
   JWT_SECRET: z.string().min(10, 'Secret must be at least 10 characters long'),
+  JWT_EXPIRATION: z.union([z.number(), z.string(), z.undefined()]),
   SALT_ROUNDS: z.string().transform(Number),
 });
 

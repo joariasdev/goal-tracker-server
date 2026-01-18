@@ -17,7 +17,7 @@ const configPassport = (passport: passport.PassportStatic) => {
       try {
         const id = jwt_payload.id;
 
-        const user = userRepo.findById(id);
+        const user = await userRepo.findById(id);
 
         if (!user)
           return done(null, false, { message: 'User does not exist.' });

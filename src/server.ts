@@ -7,6 +7,7 @@ import errorHandler from './middleware/errorHandler';
 import authRouter from './routes/authRouter';
 import passport from 'passport';
 import configPassport from './config/passport';
+import isAuthorized from './middleware/authHandler';
 
 const app = express();
 
@@ -21,7 +22,7 @@ configPassport(passport);
 app.use(passport.initialize());
 
 app.use('/auth', authRouter);
-app.use('/api', passport.authenticate('jwt', { session: false }), apiRouter);
+app.use('/api', isAuthorized, apiRouter);
 
 app.use(errorHandler);
 

@@ -24,7 +24,6 @@ export default class UserController {
       const token = jwt.sign(payload, env.JWT_SECRET, { expiresIn: '24h' });
 
       return res.status(200).json({ success: true, token: `Bearer ${token}` });
-      
     } catch (error) {
       return next(error);
     }
@@ -43,7 +42,6 @@ export default class UserController {
       res
         .status(200)
         .json({ succes: true, message: 'Account created successfully.' });
-
     } catch (error) {
       next(error);
     }
