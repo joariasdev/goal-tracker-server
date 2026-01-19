@@ -1,5 +1,5 @@
-
-import HttpError from '../errors/HttpError';
+import NotFoundError from '../errors/NotFoundError';
+import ValidationError from '../errors/ValidationError';
 import { GoalRepository } from '../interfaces/GoalRepository';
 import { GoalView } from '../models/Goal';
 import { NextFunction, Request, Response } from 'express';
@@ -24,7 +24,7 @@ class GoalController {
       const goal = await this.repo.getById(id);
 
       if (!goal) {
-        throw new HttpError(`Goal with ID ${id} not found.`, 404);
+        throw new NotFoundError(`Goal with ID ${id} not found.`);
       }
 
       res.status(200).send(goal);
@@ -45,8 +45,14 @@ class GoalController {
         const validationErrors = validationResult(req);
 
         if (!validationErrors.isEmpty()) {
-          res.status(400).send({ errors: validationErrors.array() });
-          return;
+          const errors = validationErrors.array();
+
+          const error = {
+            message: 'Your request is invalid',
+            validation: errors,
+          };
+
+          throw new ValidationError(error);
         }
 
         const { title }: GoalView = req.body;
@@ -72,8 +78,14 @@ class GoalController {
         const validationErrors = validationResult(req);
 
         if (!validationErrors.isEmpty()) {
-          res.status(400).send({ errors: validationErrors.array() });
-          return;
+          const errors = validationErrors.array();
+
+          const error = {
+            message: 'Your request is invalid',
+            validation: errors,
+          };
+
+          throw new ValidationError(error);
         }
 
         const id = Number(req.params.id);
@@ -82,7 +94,7 @@ class GoalController {
         const goal = await this.repo.update({ id, title });
 
         if (!goal) {
-          throw new HttpError(`Goal with ID ${id} not found.`, 404);
+          throw new NotFoundError(`Goal with ID ${id} not found.`);
         }
 
         res.status(200).send(goal);
@@ -98,7 +110,7 @@ class GoalController {
       const goal = await this.repo.delete(id);
 
       if (!goal) {
-        throw new HttpError(`Goal with ID ${id} not found.`, 404);
+        throw new NotFoundError(`Goal with ID ${id} not found.`);
       }
 
       res.status(200).send(goal);

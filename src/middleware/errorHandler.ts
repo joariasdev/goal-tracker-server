@@ -1,8 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import HttpError from '../errors/HttpError';
+import BaseError from '../errors/BaseError';
+
+interface ErrorResponse {
+  code: string;
+  message: string;
+  validation?: unknown;
+}
 
 const errorHandler = (
-  err: HttpError,
+  err: BaseError,
   req: Request,
   res: Response,
   next: NextFunction,
@@ -19,13 +25,19 @@ const errorHandler = (
     console.error(`[PROD ERROR] ${statusCode} on ${req.originalUrl}`);
   }
 
-  res.status(statusCode).json({
-    status: statusCode,
+  const error: ErrorResponse = {
+    code: err.code,
     message:
       statusCode >= 500 && isProduction
         ? 'An unexpected internal server error ocurred.'
         : err.message || 'Something went wrong.',
-  });
+  };
+
+  if (err.validation) {
+    error.validation = err.validation;
+  }
+
+  res.status(statusCode).json({ error });
 };
 
 export default errorHandler;

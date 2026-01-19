@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
 import passport from 'passport';
+import AuthenticationError from '../errors/AuthenticationError';
 
 export default async function isAuthorized(
   req: Request,
@@ -16,10 +17,7 @@ export default async function isAuthorized(
       }
 
       if (!user) {
-        return res.status(401).json({
-          success: false,
-          message: info.message ?? 'Unauthorized',
-        });
+        next(new AuthenticationError(info.message ?? 'Unauthorized'));
       }
 
       req.user = user;
