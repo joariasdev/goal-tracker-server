@@ -1,9 +1,9 @@
 import NotFoundError from '../errors/NotFoundError';
-import ValidationError from '../errors/ValidationError';
 import { GoalRepository } from '../interfaces/GoalRepository';
 import { GoalView } from '../models/Goal';
 import { NextFunction, Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
+import validateInput from '../utils/validateInput';
 
 class GoalController {
   public constructor(private readonly repo: GoalRepository) {}
@@ -42,18 +42,7 @@ class GoalController {
 
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const validationErrors = validationResult(req);
-
-        if (!validationErrors.isEmpty()) {
-          const errors = validationErrors.array();
-
-          const error = {
-            message: 'Your request is invalid',
-            validation: errors,
-          };
-
-          throw new ValidationError(error);
-        }
+        validateInput(req);
 
         const { title }: GoalView = req.body;
 
@@ -75,18 +64,7 @@ class GoalController {
 
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const validationErrors = validationResult(req);
-
-        if (!validationErrors.isEmpty()) {
-          const errors = validationErrors.array();
-
-          const error = {
-            message: 'Your request is invalid',
-            validation: errors,
-          };
-
-          throw new ValidationError(error);
-        }
+        validateInput(req);
 
         const id = Number(req.params.id);
         const { title }: GoalView = req.body;
