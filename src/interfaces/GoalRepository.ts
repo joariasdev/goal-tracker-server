@@ -1,9 +1,9 @@
 import { Goal, GoalView } from '../models/Goal';
 
 export interface GoalRepository {
-  getAll: () => Promise<Goal[]>;
-  getById: (id: number) => Promise<Goal | null>;
-  create: (goal: GoalView) => Promise<Goal>;
-  update: (goal: Goal) => Promise<Goal>;
-  delete: (id: number) => Promise<Goal>;
+  getAll: (userId: number) => Promise<Goal[]>;
+  getById: (userdId: number, goalId: number) => Promise<Goal | null>;
+  create: (userId: number, goal: GoalView) => Promise<Goal>;
+  update: (userId: number, goal: Goal) => Promise<Goal>;
+  delete: (userId: number, goalId: number) => Promise<Goal>;
 }

@@ -26,7 +26,7 @@ const errorHandler = (
   }
 
   const error: ErrorResponse = {
-    code: err.code,
+    code: statusCode >= 500 && isProduction ? 'serverError' : err.code,
     message:
       statusCode >= 500 && isProduction
         ? 'An unexpected internal server error ocurred.'

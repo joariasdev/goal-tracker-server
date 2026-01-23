@@ -6,6 +6,7 @@ import { UserRepository } from '../interfaces/UserRepository';
 import AuthenticationError from '../errors/AuthenticationError';
 import { body } from 'express-validator';
 import validateInput from '../utils/validateInput';
+import { UserView } from '../models/User';
 
 export default class UserController {
   public constructor(private readonly repo: UserRepository) {}
@@ -66,7 +67,7 @@ export default class UserController {
       try {
         validateInput(req);
 
-        const { email, password } = req.body;
+        const { email, password, firstName, lastName }: UserView = req.body;
 
         const existingUser = await this.repo.findByEmail(email);
 
@@ -79,7 +80,12 @@ export default class UserController {
         }
         const hashedPassword = await bcrypt.hash(password, env.SALT_ROUNDS);
 
-        const newUser = this.repo.create(email, hashedPassword);
+        const newUser = await this.repo.create({
+          email,
+          password: hashedPassword,
+          firstName,
+          lastName,
+        });
 
         // Define correct error with 500 code
         if (!newUser)

@@ -1,7 +1,7 @@
-import { User } from '../models/User';
+import { User, UserView } from '../models/User';
 
 export interface UserRepository {
-  create: (email: string, hashedPassword: string) => Promise<User>;
+  create: (user: UserView) => Promise<User>;
   findById: (id: number) => Promise<User | null>;
   findByEmail: (email: string) => Promise<User | null>;
 }
