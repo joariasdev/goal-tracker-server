@@ -6,7 +6,9 @@ import { env } from './env';
 
 const configPassport = (passport: passport.PassportStatic) => {
   const options = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    jwtFromRequest: ExtractJwt.fromExtractors([
+      (req) => req.cookies.accessToken,
+    ]),
     secretOrKey: env.JWT_SECRET,
   };
 

@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { env } from '../config/env';
 import { Request, Response, NextFunction } from 'express';
 import { UserRepository } from '../interfaces/UserRepository';
@@ -7,6 +7,7 @@ import AuthenticationError from '../errors/AuthenticationError';
 import { body } from 'express-validator';
 import validateInput from '../utils/validateInput';
 import { UserView } from '../models/User';
+import NotFoundError from '../errors/NotFoundError';
 
 export default class UserController {
   public constructor(private readonly repo: UserRepository) {}
@@ -39,9 +40,33 @@ export default class UserController {
         }
 
         const payload = { id: user.id };
-        const token = jwt.sign(payload, env.JWT_SECRET, { expiresIn: '24h' });
+        const accessToken = jwt.sign(payload, env.JWT_SECRET, {
+          expiresIn: '15m',
+        });
+        const refreshToken = jwt.sign(payload, env.JWT_SECRET, {
+          expiresIn: '7d',
+        });
 
-        return res.status(200).json({ token: `Bearer ${token}` });
+        res.cookie('accessToken', accessToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          maxAge: 15 * 60 * 1000,
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        });
       } catch (error) {
         return next(error);
       }
@@ -99,4 +124,27 @@ export default class UserController {
       }
     },
   ];
+
+  me = async (req: Request, res: Response) => {
+    const { accessToken } = req.cookies;
+
+    if (!accessToken) {
+      throw new AuthenticationError('Invalid token');
+    }
+
+    const jwtPayload = jwt.verify(accessToken, env.JWT_SECRET) as JwtPayload;
+
+    const user = await this.repo.findById(jwtPayload.id);
+
+    if (!user) {
+      throw new NotFoundError('User not found.');
+    }
+
+    return res.status(200).json({
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    });
+  };
 }
