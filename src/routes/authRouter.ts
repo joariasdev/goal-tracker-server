@@ -11,5 +11,6 @@ const router = Router();
 router.post('/login', userController.login);
 router.post('/register', userController.register);
 router.get('/me', userController.me);
+router.get('/refresh', userController.refresh);
 
 export default router;
